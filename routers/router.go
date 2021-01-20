@@ -29,6 +29,8 @@ func init() {
 	beego.Router("/channel/top", &controllers.TopController{}, "get:ChannelTop")
 	beego.Router("/type/top", &controllers.TopController{}, "get:TypeTop")
 	beego.Router("/send/message/do", &controllers.UserController{}, "get:SendMessageDo")
+	beego.Router("/barrage/ws", &controllers.BarrageController{}, "get:BarrageWs")
+	beego.Router("/barrage/save", &controllers.BarrageController{}, "get:Save")
 	//beego.Include(&controllers.UserController{})
 	//ns := beego.NewNamespace("/v1",
 	//	beego.NSNamespace("/object",
