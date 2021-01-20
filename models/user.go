@@ -15,6 +15,13 @@ type User struct {
 	Avatar   string
 }
 
+type UserInfo struct {
+	Id      int    `json:"id"`
+	Name    string `json:"name"`
+	AddTime int64  `json:"add_time"`
+	Avatar  string `json:"avatar"`
+}
+
 func init() {
 	orm.RegisterModel(new(User))
 }
@@ -58,4 +65,12 @@ func IsMobileLogin(mobile, password string) (int, string) {
 		return 0, ""
 	}
 	return user.Id, user.Name
+}
+
+//根据用户ID获取用户信息
+func GetUserInfo(uid int) (UserInfo, error) {
+	o := orm.NewOrm()
+	var user UserInfo
+	err := o.Raw("SELECT id,name,add_time,avatar FROM user WHERE id=? LIMIT 1", uid).QueryRow(&user)
+	return user, err
 }

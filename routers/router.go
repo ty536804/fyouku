@@ -22,6 +22,13 @@ func init() {
 	beego.Router("/channel/region", &controllers.BaseController{}, "get:ChannelRegion")
 	beego.Router("/channel/type", &controllers.BaseController{}, "get:ChannelType")
 	beego.Router("/channel/video", &controllers.BaseController{}, "get:ChannelVideo")
+	beego.Router("/video/info", &controllers.AdvertController{}, "get:VideoInfo")
+	beego.Router("/video/episodes/list", &controllers.AdvertController{}, "get:VideoEpisodesList")
+	beego.Router("/comment/list", &controllers.CommentController{}, "get:List")
+	beego.Router("/comment/save", &controllers.CommentController{}, "get:Save")
+	beego.Router("/channel/top", &controllers.TopController{}, "get:ChannelTop")
+	beego.Router("/type/top", &controllers.TopController{}, "get:TypeTop")
+	beego.Router("/send/message/do", &controllers.UserController{}, "get:SendMessageDo")
 	//beego.Include(&controllers.UserController{})
 	//ns := beego.NewNamespace("/v1",
 	//	beego.NSNamespace("/object",
