@@ -71,3 +71,19 @@ func (b *BaseController) ChannelVideo() {
 	}
 	b.ServeJSON()
 }
+
+// @Summer 我的频道管理
+func (b *BaseController) UserVideo() {
+	uid, _ := b.GetInt("uid")
+	if uid == 0 {
+		b.Data["json"] = ReturnError(4001, "必须指定用户")
+		b.ServeJSON()
+	}
+	num, videos, err := models.GetUserVideo(uid)
+	if err == nil {
+		b.Data["json"] = ReturnSuccess(200, "success", videos, num)
+	} else {
+		b.Data["json"] = ReturnError(4004, "没有相关内容")
+	}
+	b.ServeJSON()
+}
