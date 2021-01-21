@@ -131,9 +131,9 @@ func (u *UserController) UploadVideo() {
 	var playUrl = "static/video/" + filename[0] + "." + filename[1]
 	err = ioutil.WriteFile(fileDir, b, 0777)
 	if err == nil {
-		title = ReturnSuccess(200, "success", playUrl, 1)
+		title = utils.ReturnSuccess(200, "success", playUrl, 1)
 	} else {
-		title = ReturnError(5000, "上传失败,请联系客服")
+		title = utils.ReturnError(5000, "上传失败,请联系客服")
 	}
 	u.Ctx.WriteString(title)
 }
