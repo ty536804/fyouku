@@ -15,8 +15,8 @@ type AliYunController struct {
 }
 
 var (
-	accessKeyId     = "LTAI4GKK942rberZCkydxdtN"
-	accessKeySecret = "Bb2jB4NEhM5835ynHuTRGwpRSeq6ao"
+	accessKeyId     = ""
+	accessKeySecret = ""
 )
 
 type JSONS struct {
