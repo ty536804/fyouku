@@ -1,4 +1,4 @@
-package redis
+package redisClient
 
 import (
 	"github.com/garyburd/redigo/redis"
@@ -19,7 +19,7 @@ func PoolConnect() redis.Conn {
 		IdleTimeout: 180 * time.Second, //超时时间
 		Wait:        true,              //超过最大连接数之后的操作  等待还是报错   等待
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", "127.0.0.1:9379")
+			c, err := redis.Dial("tcp", "127.0.0.1:6379")
 			if err != nil {
 				return nil, err
 			}

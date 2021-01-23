@@ -89,7 +89,7 @@ func (v *AdvertController) VideoInfo() {
 		v.Data["json"] = ReturnError(4001, "必须指定视频ID")
 		v.ServeJSON()
 	}
-	video, err := models.GetVideoInfo(videoId)
+	video, err := models.RedisGetVideoInfo(videoId)
 	if err == nil {
 		v.Data["json"] = ReturnSuccess(200, "success", video, 0)
 	} else {

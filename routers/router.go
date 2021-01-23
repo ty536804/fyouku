@@ -31,6 +31,7 @@ func init() {
 	beego.Router("/send/message/do", &controllers.UserController{}, "get:SendMessageDo")
 	beego.Router("/barrage/ws", &controllers.BarrageController{}, "get:BarrageWs")
 	beego.Router("/barrage/save", &controllers.BarrageController{}, "get:Save")
+	beego.Router("/redis/demo", &controllers.RedisDemoController{}, "get:Demo")
 	//beego.Include(&controllers.UserController{})
 	//ns := beego.NewNamespace("/v1",
 	//	beego.NSNamespace("/object",
