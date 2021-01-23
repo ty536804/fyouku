@@ -1,6 +1,9 @@
 package models
 
-import "github.com/astaxie/beego/orm"
+import (
+	"github.com/astaxie/beego/orm"
+	"time"
+)
 
 type VideoData struct {
 	Id            int
@@ -27,8 +30,9 @@ type Video struct {
 	RegionId           int
 	TypeId             int
 	Sort               int
-	EpisodesUpdateTime int
+	EpisodesUpdateTime int64
 	Comment            int
+	UserId             int
 }
 
 type Episodes struct {
@@ -136,4 +140,37 @@ func GetUserVideo(uid int) (int64, []VideoData, error) {
 	var videos []VideoData
 	nums, err := o.Raw("id,title,sub_title,img,img1,add_time,episodes_count,is_end FROM video WHERE user_id=? ORDER BY add_time DESC", uid).QueryRows(&videos)
 	return nums, videos, err
+}
+
+func SaveVideo(playUrl, title, subTitle, aliyunVideoId string, channelId, typeId, regionId, uid int) error {
+	times := time.Now().Unix()
+	o := orm.NewOrm()
+	var video Video
+	video.Title = title
+	video.SubTitle = subTitle
+	video.AddTime = times
+	video.Img = ""
+	video.Img1 = ""
+	video.Status = 1
+	video.ChannelId = channelId
+	video.TypeId = typeId
+	video.RegionId = regionId
+	video.Comment = 0
+	video.EpisodesUpdateTime = times
+	video.UserId = uid
+	videoId, err := o.Insert(&video)
+	if err == nil {
+		if aliyunVideoId != "" {
+			playUrl = ""
+		}
+		o.Raw("INSERT INTO video_episodes (title,add_time,num,video_id,play_url,"+
+			"status,comment,aliyun_video_id) VALUES (?,?,?,?,?,?,?)", subTitle, times, 1, videoId, playUrl, 1, 0, aliyunVideoId).Exec()
+	}
+	return err
+}
+
+func SaveAliYunVideo(videoId, log string) error {
+	o := orm.NewOrm()
+	_, err := o.Raw("INSERT INTO aliyun_video (video_id,log,add_time) VALUES(?,?,?)", videoId, log, time.Now().Unix()).Exec()
+	return err
 }

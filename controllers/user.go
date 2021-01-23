@@ -137,3 +137,30 @@ func (u *UserController) UploadVideo() {
 	}
 	u.Ctx.WriteString(title)
 }
+
+// 保存用户上传信息
+func (u *UserController) VideoSave() {
+	playUrl := u.GetString("playUrl")
+	title := u.GetString("title")
+	subTitle := u.GetString("subTitle")
+	channelId, _ := u.GetInt("channelId")
+	typeId, _ := u.GetInt("typeId")
+	regionId, _ := u.GetInt("regionId")
+	uid, _ := u.GetInt("uid")
+	aliyunVideoId := u.GetString("aliyunVideoId")
+	if uid == 0 {
+		u.Data["json"] = ReturnError(4001, "请先登录")
+		u.ServeJSON()
+	}
+	if playUrl == "" {
+		u.Data["json"] = ReturnError(4002, "视频地址不能为空")
+		u.ServeJSON()
+	}
+	err := models.SaveVideo(playUrl, title, subTitle, aliyunVideoId, channelId, typeId, regionId, uid)
+	if err == nil {
+		u.Data["json"] = ReturnSuccess(200, "success", nil, 1)
+	} else {
+		u.Data["json"] = ReturnError(4004, "上传失败")
+	}
+	u.ServeJSON()
+}
