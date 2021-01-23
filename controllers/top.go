@@ -16,7 +16,7 @@ func (t *TopController) ChannelTop() {
 		t.Data["json"] = ReturnError(4001, "必须指定频道ID")
 		t.ServeJSON()
 	}
-	num, videos, err := models.GetChannelTop(channelId)
+	num, videos, err := models.RedisGetChannelTop(channelId)
 	if err == nil {
 		t.Data["json"] = ReturnSuccess(200, "success", videos, num)
 	} else {
@@ -32,7 +32,7 @@ func (t *TopController) TypeTop() {
 		t.Data["json"] = ReturnError(4001, "必须指定类型")
 		t.ServeJSON()
 	}
-	num, videos, err := models.GetTypeTop(typeId)
+	num, videos, err := models.RedisGetTypeTop(typeId)
 	if err == nil {
 		t.Data["json"] = ReturnSuccess(200, "success", videos, num)
 	} else {

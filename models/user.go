@@ -1,7 +1,9 @@
 package models
 
 import (
+	redisClient "fyoukuApi/Services/redis"
 	"github.com/astaxie/beego/orm"
+	"github.com/garyburd/redigo/redis"
 	"time"
 )
 
@@ -72,5 +74,28 @@ func GetUserInfo(uid int) (UserInfo, error) {
 	o := orm.NewOrm()
 	var user UserInfo
 	err := o.Raw("SELECT id,name,add_time,avatar FROM user WHERE id=? LIMIT 1", uid).QueryRow(&user)
+	return user, err
+}
+
+func RedisGetUserInfo(uid int) (UserInfo, error) {
+	var user UserInfo
+
+	conn := redisClient.PoolConnect()
+	defer conn.Close()
+	redisKey := "user:uid:" + string(uid)
+	exists, err := redis.Bool(conn.Do("exists", redisKey))
+	if exists {
+		res, _ := redis.Values(conn.Do("hgetall", redisKey))
+		err = redis.ScanStruct(res, &user)
+	} else {
+		o := orm.NewOrm()
+		err := o.Raw("SELECT id,name,add_time,avatar FROM user WHERE id=? LIMIT 1", uid).QueryRow(&user)
+		if err == nil {
+			_, err := conn.Do("hmset", redis.Args{redisKey}.AddFlat(user))
+			if err == nil {
+				conn.Do("expire", redisKey, 86400)
+			}
+		}
+	}
 	return user, err
 }

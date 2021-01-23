@@ -46,7 +46,7 @@ func (c *CommentController) List() {
 			commentInfo.UserId = v.UserId
 			commentInfo.Stamp = v.Stamp
 			commentInfo.PraiseCount = v.PraiseCount
-			user, _ := models.GetUserInfo(v.UserId)
+			user, _ := models.RedisGetUserInfo(v.UserId)
 			commentInfo.UserInfo = user
 			data = append(data, commentInfo)
 		}
