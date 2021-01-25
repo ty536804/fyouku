@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/json"
+	"fyoukuApi/Services/mq"
 	"github.com/astaxie/beego/orm"
 	"time"
 )
@@ -45,6 +47,10 @@ func SaveComment(content string, uid, episodesId, videoId int) error {
 		o.Raw("UPDATE video SET comment=comment+1 WHERE id=?", videoId).Exec()
 		//修改视频剧集的评论数
 		o.Raw("UPDATE video_episodes SET comment=comment+1 WHERE id=?", episodesId).Exec()
+		//创建一个简单的模式的MQ 把要传递的数据转换为json字符串
+		videoObj := map[string]int{"VideoId": videoId}
+		videoJson, _ := json.Marshal(videoObj)
+		mq.Publish("", "fyouku_top", string(videoJson))
 	}
 	return err
 }

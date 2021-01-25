@@ -32,6 +32,13 @@ func init() {
 	beego.Router("/barrage/ws", &controllers.BarrageController{}, "get:BarrageWs")
 	beego.Router("/barrage/save", &controllers.BarrageController{}, "get:Save")
 	beego.Router("/redis/demo", &controllers.RedisDemoController{}, "get:Demo")
+	beego.Router("/mq/demo", &controllers.MqDemoController{}, "get:GetMq")
+	beego.Router("/mq/fanout", &controllers.MqDemoController{}, "get:GetFanout")
+	beego.Router("/mq/direct", &controllers.MqDemoController{}, "get:GetDirect")
+	beego.Router("/mq/topic", &controllers.MqDemoController{}, "get:GetTopic")
+	beego.Router("/mq/dlx", &controllers.MqDemoController{}, "get:GetDlx")
+	beego.Router("/mq/dlxtwo", &controllers.MqDemoController{}, "get:GetDlxTwo")
+	beego.Include(&controllers.MqDemoController{})
 	//beego.Include(&controllers.UserController{})
 	//ns := beego.NewNamespace("/v1",
 	//	beego.NSNamespace("/object",

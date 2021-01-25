@@ -100,7 +100,8 @@ func (u *UserController) SendMessageDo() {
 		uidConfig := strings.Split(uids, ",")
 		for _, v := range uidConfig {
 			userId, _ := strconv.Atoi(v)
-			models.SendMessageUser(userId, messageId)
+			models.SendMessageUserMq(userId, messageId)
+			//models.SendMessageUser(userId, messageId)
 		}
 		u.Data["json"] = ReturnSuccess(200, "success", 1, 1)
 	} else {
