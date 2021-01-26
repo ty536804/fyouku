@@ -77,6 +77,7 @@ func GetUserInfo(uid int) (UserInfo, error) {
 	return user, err
 }
 
+// @Title 获取用户信息
 func RedisGetUserInfo(uid int) (UserInfo, error) {
 	var user UserInfo
 
