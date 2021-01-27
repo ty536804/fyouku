@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fyoukuApi/Services/Es"
 	redisClient "fyoukuApi/Services/redis"
 	"github.com/astaxie/beego/orm"
 	"github.com/garyburd/redigo/redis"
@@ -38,6 +39,7 @@ type Video struct {
 	EpisodesUpdateTime int64
 	Comment            int
 	UserId             int
+	IsRecommend        int
 }
 
 type Episodes struct {
@@ -78,6 +80,7 @@ func GetChannelRecommendTypeList(channelId, typeId int) (int64, []VideoData, err
 	return num, videos, err
 }
 
+//根据传入参数获取视频列表
 func GetChannelVideoList(channelId, regionId, typeId, limit, offset int, end, sort string) (int64, []orm.Params, error) {
 	o := orm.NewOrm()
 	var videos []orm.Params
@@ -110,6 +113,48 @@ func GetChannelVideoList(channelId, regionId, typeId, limit, offset int, end, so
 	qs = qs.Limit(limit, offset)
 	_, err := qs.Values(&videos, "id", "title", "sub_title", "add_time", "img", "img1", "episodes_count", "is_end")
 	return nums, videos, err
+}
+
+//根据传入参数获取视频列表
+func GetChannelVideoListEs(channelId, regionId, typeId, limit, offset int, end, sort string) (int64, []Video, error) {
+	query := make(map[string]interface{})
+	bools := make(map[string]interface{})
+	var must []map[string]interface{}
+	must = append(must, map[string]interface{}{"term": map[string]interface{}{"channel_id": channelId}})
+	must = append(must, map[string]interface{}{"term": map[string]interface{}{"status": 1}})
+	if regionId > 0 {
+		must = append(must, map[string]interface{}{"term": map[string]interface{}{"region_id": regionId}})
+	}
+	if typeId > 0 {
+		must = append(must, map[string]interface{}{"term": map[string]interface{}{"type_id": typeId}})
+	}
+	if end == "n" { //未完结
+		must = append(must, map[string]interface{}{"term": map[string]interface{}{"is_emd": 0}})
+	} else if end == "y" { //已完结
+		must = append(must, map[string]interface{}{"term": map[string]interface{}{"is_emd": 1}})
+	}
+	bools["must"] = must
+	query["bool"] = bools
+	sortData := []map[string]string{map[string]string{"add_time": "desc"}}
+	//剧集更新时间排序
+	if sort == "episodesUpdate" { //倒序
+		sortData = []map[string]string{map[string]string{"episodes_update_time": "desc"}}
+	} else if sort == "comment" {
+		sortData = []map[string]string{map[string]string{"comment": "desc"}}
+	} else if sort == "addTime" {
+		sortData = []map[string]string{map[string]string{"add_time": "desc"}}
+	}
+	res := Es.EsSearch("fyouku_video", query, offset, limit, sortData)
+	total := res.Total.Value
+	var data []Video
+	for _, v := range res.Hits {
+		var itemData Video
+		err := json.Unmarshal([]byte(v.Source), &itemData)
+		if err != nil {
+			data = append(data, itemData)
+		}
+	}
+	return int64(total), data, nil
 }
 
 func GetVideoInfo(videoId int) (Video, error) {
@@ -351,4 +396,13 @@ func SaveAliYunVideo(videoId, log string) error {
 	o := orm.NewOrm()
 	_, err := o.Raw("INSERT INTO aliyun_video (video_id,log,add_time) VALUES(?,?,?)", videoId, log, time.Now().Unix()).Exec()
 	return err
+}
+
+//获取所有视频
+func GetAllList() (int64, []Video, error) {
+	o := orm.NewOrm()
+	var videos []Video
+	num, err := o.Raw("SELECT id,title,sub_title,status,add_time,img,img1,channel_id,type_id," +
+		"region_id,user_id,episodes_count,episodes_update_time,is_end,is_hot,is_recommend,comment FROM video").QueryRows(&videos)
+	return num, videos, err
 }

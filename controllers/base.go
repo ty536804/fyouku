@@ -63,7 +63,7 @@ func (b *BaseController) ChannelVideo() {
 	if limit == 0 {
 		limit = 12
 	}
-	num, videos, err := models.GetChannelVideoList(channelId, regionId, typeId, limit, offset, end, sort)
+	num, videos, err := models.GetChannelVideoListEs(channelId, regionId, typeId, limit, offset, end, sort)
 	if err == nil {
 		b.Data["json"] = ReturnSuccess(200, "success", videos, num)
 	} else {
